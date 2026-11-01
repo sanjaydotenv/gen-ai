@@ -10,7 +10,7 @@ export async function getSettingsFile() {
     await fs.mkdir(CONFIG_DIR, { recursive: true });
   }
 
-  const settingsFile = path.join(CONFIG_DIR, "settings.js");
+  const settingsFile = path.join(CONFIG_DIR, "settings.json");
 
   try {
     await fs.access(settingsFile);
@@ -46,6 +46,7 @@ export async function getApiKey() {
     };
   }
 
+  console.log(apiKey)
   try {
     const response = await axios.get("https://api.groq.com/openai/v1/models", {
       headers: {
