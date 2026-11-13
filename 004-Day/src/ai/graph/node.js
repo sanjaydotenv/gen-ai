@@ -1,5 +1,5 @@
 import { ChatGroq } from "@langchain/groq";
-import { getApiKey } from "../utils/files.utils.js";
+import { getApiKey } from "../../utils/files.utils.js";
 import { AIMessage } from "langchain";
 
 export const LLMNode = async (state) => {
@@ -19,7 +19,7 @@ export const LLMNode = async (state) => {
     process.stdout.write(chunk.text);
   }
 
-  process.stdout.write("\n")
+  process.stdout.write("\n");
 
   return {
     messages: [...state.messages, new AIMessage(aiMessage)],

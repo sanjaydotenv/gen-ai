@@ -1,7 +1,7 @@
 import { START, StateGraph, END } from "@langchain/langgraph";
 import * as z from "zod";
 import { LLMNode } from "./node.js";
-import { rl } from "../utils/rl.js";
+import { rl } from "../../utils/rl.js";
 import { HumanMessage } from "langchain";
 
 const stateFormate = z.object({
