@@ -12,6 +12,18 @@ const graph = new StateGraph(stateFormate)
   .addNode("LLMNode", LLMNode)
   .addNode("ToolNode", ToolNode)
   .addEdge(START, "LLMNode")
+  .addConditionalEdges(
+    "LLMNode",
+    (state) => {
+      const lastMessage = state.messages[state.messages.length - 1];
+
+      if (lastMessage.tool_calls && lastMessage.tool_calls.length > 0) {
+        return "ToolNode";
+      }
+      return "__end__";
+    },
+    ["ToolNode", "__end__"],
+  )
   .addEdge("LLMNode", END)
   .compile();
 

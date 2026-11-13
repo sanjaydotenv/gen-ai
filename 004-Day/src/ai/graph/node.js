@@ -1,7 +1,11 @@
 import { ChatGroq } from "@langchain/groq";
-import { getApiKey } from "../../utils/files.utils.js";
 import { AIMessage } from "langchain";
+import { getApiKey } from "../../utils/files.utils.js";
 import { upsertFileTool } from "../tools/file.tool.js";
+
+const fileTools = {
+  upsert_file: upsertFileTool,
+};
 
 export const LLMNode = async (state) => {
   const model = new ChatGroq({
@@ -15,19 +19,20 @@ export const LLMNode = async (state) => {
 
   process.stdout.write("[AI]: ");
 
-  let aiMessage = "";
+  let aiMessage;
 
   for await (const chunk of stream) {
-    console.log(chunk);
-    process.stdout.write(chunk.text);
-    if (!aiMessage) aiMessage = chunk;
-    else aiMessage = aiMessage.concat(chunk);
+    aiMessage = aiMessage ? aiMessage.concat(chunk) : chunk;
+
+    if (chunk.text) {
+      process.stdout.write(chunk.text);
+    }
   }
 
   process.stdout.write("\n");
 
   return {
-    messages: [...state.messages, new AIMessage(aiMessage)],
+    messages: [...state.messages, aiMessage],
   };
 };
 
