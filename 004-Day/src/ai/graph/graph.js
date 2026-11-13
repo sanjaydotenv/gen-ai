@@ -1,6 +1,6 @@
 import { START, StateGraph, END } from "@langchain/langgraph";
 import * as z from "zod";
-import { LLMNode } from "./node.js";
+import { LLMNode, ToolNode } from "./node.js";
 import { rl } from "../../utils/rl.js";
 import { HumanMessage, SystemMessage } from "langchain";
 
@@ -10,6 +10,7 @@ const stateFormate = z.object({
 
 const graph = new StateGraph(stateFormate)
   .addNode("LLMNode", LLMNode)
+  .addNode("ToolNode", ToolNode)
   .addEdge(START, "LLMNode")
   .addEdge("LLMNode", END)
   .compile();

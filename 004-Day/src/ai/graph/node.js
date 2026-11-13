@@ -18,14 +18,31 @@ export const LLMNode = async (state) => {
   let aiMessage = "";
 
   for await (const chunk of stream) {
-    aiMessage += chunk.text;
-    console.log(chunk)
+    console.log(chunk);
     process.stdout.write(chunk.text);
+    if (!aiMessage) aiMessage = chunk;
+    else aiMessage = aiMessage.concat(chunk);
   }
 
   process.stdout.write("\n");
 
   return {
     messages: [...state.messages, new AIMessage(aiMessage)],
+  };
+};
+
+export const ToolNode = async (state) => {
+  const messages = state.messages;
+  const lastMessage = state.messages[state.messages.length - 1];
+  const toolCalls = lastMessage.tool_calls;
+
+  const toolResults = await Promise.all(
+    toolCalls.map(async (toolCall) => {
+      return await fileTools[toolCall.name].invoke(toolCall);
+    }),
+  );
+
+  return {
+    messages: [...state.messages, ...toolResults],
   };
 };
