@@ -15,14 +15,17 @@ const graph = new StateGraph(stateFormate)
   .compile();
 
 export const initGraph = async () => {
+  let messages = [];
+
   while (true) {
     const userInput = await rl.question("[USER]: ");
 
+    messages.push(new HumanMessage(userInput));
+
     const response = await graph.invoke({
-      messages: [new HumanMessage(userInput)],
+      messages,
     });
 
-
-    console.log("[AI]: ", response)
+    messages = response.messages;
   }
 };
