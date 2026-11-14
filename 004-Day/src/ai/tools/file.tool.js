@@ -1,7 +1,6 @@
-import { tool } from "langchain";
-import * as z from "zod";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
 import fs from "fs/promises";
-import path from "path";
 
 export const upsertFileTool = tool(
   async function ({ files }) {
@@ -11,40 +10,82 @@ export const upsertFileTool = tool(
       }),
     );
 
-    return "File Created Successfully";
+    return "Files created successfully";
   },
   {
     name: "upsert_file",
-    description:
-      "create/update multiple file at once (create one if not existed",
+    description: "Create or update multiple files at once.",
     schema: z.object({
       files: z.array(
         z.object({
-          path: z
-            .string()
-            .describe("absoulute path of the file to create/update"),
-          content: z.string().describe("content of the file to create/update"),
+          path: z.string().describe("Absolute path of the file"),
+          content: z.string().describe("Content of the file"),
         }),
       ),
     }),
   },
 );
 
-export const readFiles = tool(async function ({ files }) {
-  const result = await Promise.all(
-    files.map(async (file) => {
-      const content = await fs.readFile(file.path, "utf-8");
-      return { path: file.path, content };
-    }),
-  );
+export const listFiles = tool(
+  async function ({ folder }) {
+    const results = [];
 
-  return result
-} , {
-  name: "readFiles",
-  description: "Read the content of multiple file at once",
-  schema: z.array({
-    files: z.array(z.object({
-      path: z.string().describe("absolute path of the file be to read")
-    }))
-  })
-});
+    async function traverse(currentFolder) {
+      const entries = await fs.readdir(currentFolder, {
+        withFileTypes: true,
+      });
+
+      for (const entry of entries) {
+        const fullPath = `${currentFolder}/${entry.name}`;
+
+        if (entry.isDirectory()) {
+          if (entry.name === "node_modules") continue;
+
+          await traverse(fullPath);
+        } else {
+          results.push(fullPath);
+        }
+      }
+    }
+
+    await traverse(folder);
+
+    return JSON.stringify(results);
+  },
+  {
+    name: "list_files",
+    description:
+      "List all folders and files recursively, ignoring node_modules.",
+    schema: z.object({
+      folder: z.string().describe("Absolute path of the folder to list"),
+    }),
+  },
+);
+
+export const readFiles = tool(
+  async function ({ files }) {
+    const result = await Promise.all(
+      files.map(async (file) => {
+        const content = await fs.readFile(file.path, "utf-8");
+
+        return {
+          path: file.path,
+          content,
+        };
+      }),
+    );
+
+    return JSON.stringify(result);
+  },
+  {
+    name: "read_files",
+    description: "Read the content of multiple files at once.",
+    schema: z.object({
+      files: z.array(
+        z.object({
+          path: z.string().describe("Absolute path of the file to read"),
+        }),
+      ),
+    }),
+  },
+);

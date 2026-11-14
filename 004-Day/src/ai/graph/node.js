@@ -1,10 +1,12 @@
 import { ChatGroq } from "@langchain/groq";
 import { AIMessage } from "langchain";
 import { getApiKey } from "../../utils/files.utils.js";
-import { upsertFileTool } from "../tools/file.tool.js";
+import { upsertFileTool , readFiles, listFiles } from "../tools/file.tool.js";
 
 const fileTools = {
   upsert_file: upsertFileTool,
+  read_files: readFiles,
+  list_files: listFiles,
 };
 
 export const LLMNode = async (state) => {
@@ -13,7 +15,7 @@ export const LLMNode = async (state) => {
     apiKey: (await getApiKey()).apiKey,
   });
 
-  const modelWithTool = model.bindTools([upsertFileTool]);
+  const modelWithTool = model.bindTools([upsertFileTool,readFiles,listFiles]);
 
   const stream = await modelWithTool.stream(state.messages);
 
