@@ -1,6 +1,7 @@
 import { tool } from "langchain";
 import * as z from "zod";
 import fs from "fs/promises";
+import path from "path";
 
 export const upsertFileTool = tool(
   async function ({ files }) {
@@ -28,3 +29,22 @@ export const upsertFileTool = tool(
     }),
   },
 );
+
+export const readFiles = tool(async function ({ files }) {
+  const result = await Promise.all(
+    files.map(async (file) => {
+      const content = await fs.readFile(file.path, "utf-8");
+      return { path: file.path, content };
+    }),
+  );
+
+  return result
+} , {
+  name: "readFiles",
+  description: "Read the content of multiple file at once",
+  schema: z.array({
+    files: z.array(z.object({
+      path: z.string().describe("absolute path of the file be to read")
+    }))
+  })
+});
