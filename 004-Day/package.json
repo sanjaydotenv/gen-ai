@@ -1,9 +1,6 @@
 {
   "name": "004-day",
   "version": "1.0.0",
-  "bin": {
-    "run-cli": "./app.js"
-  },
   "description": "",
   "main": "index.js",
   "scripts": {
