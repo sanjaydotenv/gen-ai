@@ -1,10 +1,24 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import axios from "axios";
+import { Link, Navigate, useNavigate } from "react-router";
+import axiosInstance from "../../config/axiosInstance";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../../features/auth/authSlice";
+import { useEffect } from "react";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.auth);
+
+  async function hydrateUser() {
+    const data = await axiosInstance.get("/auth/me");
+    dispatch(setUserData(data.data.user));
+  }
+
+  useEffect(() => {
+    hydrateUser();
+  }, []);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,21 +42,22 @@ export default function RegisterPage() {
       setLoading(true);
       setError("");
 
-      await axios.post(
-        "/api/auth/register",
-        formData,
-        { withCredentials: true }
-      );
+      const data = await axiosInstance.post("/auth/register", formData, {
+        withCredentials: true,
+      });
 
+      dispatch(setUserData(data.data.user));
       navigate("/dashboard");
     } catch (error) {
-      setError(
-        error.response?.data?.message || "Something went wrong"
-      );
+      setError(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
+
+  if (userData) {
+    return <Navigate to={"/dashboard"} />;
+  }
 
   return (
     <main className="auth-page">
@@ -118,24 +133,17 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <button
-            className="auth-submit"
-            type="submit"
-            disabled={loading}
-          >
+          <button className="auth-submit" type="submit" disabled={loading}>
             {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
 
         <p className="auth-switch">
-          Already have an account?{" "}
-          <Link to="/">Sign in</Link>
+          Already have an account? <Link to="/">Sign in</Link>
         </p>
       </section>
 
-      <p className="auth-footer">
-        A clearer way to your next big thing.
-      </p>
+      <p className="auth-footer">A clearer way to your next big thing.</p>
     </main>
   );
 }

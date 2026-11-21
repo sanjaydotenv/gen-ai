@@ -15,7 +15,14 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name?.trim() || !email?.trim() || typeof password !== "string" || !password) {
+    console.log(name, email, password);
+
+    if (
+      !name?.trim() ||
+      !email?.trim() ||
+      typeof password !== "string" ||
+      !password
+    ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
@@ -110,10 +117,7 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -157,3 +161,5 @@ export const logoutUser = (req, res) => {
     message: "Logged out successfully",
   });
 };
+
+

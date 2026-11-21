@@ -1,9 +1,26 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import axios from "axios";
+import axiosInstance from "../../config/axiosInstance";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../../features/auth/authSlice";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+
+  const { userData } = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+
+  async function hydrateUser() {
+    const data = await axiosInstance.get("/auth/me");
+    dispatch(setUserData(data.data.user));
+  }
+
+  useEffect(() => {
+    hydrateUser();
+  }, []);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -27,10 +44,11 @@ export default function LoginPage() {
       setLoading(true);
       setError("");
 
-      const { data } = await axios.post("/api/auth/login", formData, {
+      const { data } = await axiosInstance.post("/auth/login", formData, {
         withCredentials: true,
       });
 
+      dispatch(setUserData(data.user));
       navigate("/dashboard");
     } catch (error) {
       setError(error.response?.data?.message || "Something went wrong");
@@ -38,6 +56,9 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+  if (userData){
+    return <Navigate to={"/dashboard"} />
+  }
 
   return (
     <main className="auth-page">

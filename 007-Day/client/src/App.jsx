@@ -2,7 +2,7 @@ import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
-// import LoginPage from "./pages/auth/LoginPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -14,10 +14,10 @@ const App = () => {
       path: "/register",
       element: <RegisterPage />,
     },
-    // {
-    //   path: "/dashboard",
-    //   element: <DashboardPage />,
-    // },
+    {
+      path: "/dashboard",
+      element: <DashboardPage />,
+    },
   ]);
 
   return <RouterProvider router={router} />;
