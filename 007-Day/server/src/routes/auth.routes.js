@@ -5,6 +5,7 @@ import {
   loginUser,
   logoutUser,
 } from "../controllers/auth.controller.js";
+import conversationController from "../controllers/conversation.controller.js";
 
 import protectRoute from "../middleware/auth.middleware.js";
 
@@ -26,5 +27,7 @@ router.get("/me", protectRoute, (req, res) => {
     },
   });
 });
+
+router.post("/conversation",protectRoute ,conversationController.handleMessage);
 
 export default router;
