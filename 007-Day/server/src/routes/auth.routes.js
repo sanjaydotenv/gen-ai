@@ -28,8 +28,21 @@ router.get("/me", protectRoute, (req, res) => {
   });
 });
 
-router.post("/conversation",protectRoute ,conversationController.handleMessage);
+router.post(
+  "/conversation",
+  protectRoute,
+  conversationController.handleMessage,
+);
 
-router.get("/get-all-conversation" , protectRoute , conversationController.getAllConversations)
+router.get(
+  "/get-all-conversation",
+  protectRoute,
+  conversationController.getAllConversations,
+);
+router.get(
+  "/get-all-messages/:conversationId",
+  protectRoute,
+  conversationController.getAllMessages,
+);
 
 export default router;

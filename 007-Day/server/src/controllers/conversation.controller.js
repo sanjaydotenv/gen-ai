@@ -127,11 +127,11 @@ const handleMessage = async (req, res, next) => {
   }
 };
 
-export async function getAllConversations(req, res) {
+const getAllConversations = async (req, res) => {
   const user = req.user;
 
   console.log(user);
-  const conversations = await ConversationModel.findOne({ user: user.userId });
+  const conversations = await ConversationModel.findOne({ user: user._id });
 
   if (!conversations) {
     res.status(404).json({
@@ -143,6 +143,33 @@ export async function getAllConversations(req, res) {
     message: "Conversation fetched successfully",
     conversations,
   });
-}
+};
 
-export default { handleMessage, getAllConversations };
+const getAllMessages = async (req, res) => {
+  const { conversationId } = req.params;
+
+  console.log(conversationId)
+
+  if (!conversationId) {
+    return res.status(404).json({
+      message: "Conversation ID is not found in params",
+    });
+  }
+
+  const messages = await MessageModel.find({ conversation: conversationId });
+
+  console.log(messages)
+
+  if (!messages) {
+    return res.status(404).json({
+      message: "Messages is not found",
+    });
+  }
+
+  res.status(200).json({
+    message: "All Messages Fetch Suuccessfully",
+    messages
+  });
+};
+
+export default { handleMessage, getAllConversations, getAllMessages };
