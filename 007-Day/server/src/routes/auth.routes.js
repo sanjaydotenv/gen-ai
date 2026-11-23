@@ -30,4 +30,6 @@ router.get("/me", protectRoute, (req, res) => {
 
 router.post("/conversation",protectRoute ,conversationController.handleMessage);
 
+router.get("/get-all-conversation" , protectRoute , conversationController.getAllConversations)
+
 export default router;

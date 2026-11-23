@@ -127,4 +127,22 @@ const handleMessage = async (req, res, next) => {
   }
 };
 
-export default { handleMessage };
+export async function getAllConversations(req, res) {
+  const user = req.user;
+
+  console.log(user);
+  const conversations = await ConversationModel.findOne({ user: user.userId });
+
+  if (!conversations) {
+    res.status(404).json({
+      message: "Conversation not found",
+    });
+  }
+
+  return res.status(200).json({
+    message: "Conversation fetched successfully",
+    conversations,
+  });
+}
+
+export default { handleMessage, getAllConversations };
