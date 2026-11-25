@@ -5,6 +5,8 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 
 const App = () => {
+
+  
   const router = createBrowserRouter([
     {
       path: "/",
